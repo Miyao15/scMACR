@@ -7,7 +7,7 @@ Pipeline:
 3) RNA preprocessing: normalize_total -> log1p -> highly_variable_genes -> subset -> scale.
 4) ADT preprocessing: normalize_total -> log1p -> scale.
 5) Feature concatenation and H5 export.
-6) Optional: Direct execution of training via scMAGCL main module.
+6) Optional: Direct execution of training via scMACR main module.
 """
 
 import os
@@ -22,9 +22,9 @@ import re
 from scipy.io import mmread
 from scipy.sparse import csr_matrix
 
-# Dynamic path configuration for scMAGCL modules
+# Dynamic path configuration for scMACR modules
 _PREP_DIR = os.path.dirname(os.path.abspath(__file__))
-_MAIN_DIR = os.path.join(os.path.dirname(_PREP_DIR), "scMAGCL-main")
+_MAIN_DIR = os.path.join(os.path.dirname(_PREP_DIR), "scMACR-main")
 if _MAIN_DIR not in sys.path:
     sys.path.insert(0, _MAIN_DIR)
 
@@ -162,7 +162,7 @@ def main():
     parser.add_argument("--adt_h5ad", type=str, default=None)
     parser.add_argument("--label_csv", type=str, default=None)
     parser.add_argument("--tag", type=str, default="4")
-    parser.add_argument("--out_dir", type=str, default="scMAGCL_data")
+    parser.add_argument("--out_dir", type=str, default="scMACR_data")
     parser.add_argument("--filter2", "-f2", type=int, default=None)
     parser.add_argument("--no_clr", action="store_true")
     parser.add_argument("--no_scale", action="store_true")
@@ -228,7 +228,7 @@ def main():
     X_concat = np.nan_to_num(np.hstack([X_rna, X_adt])).astype(np.float32)
     
     os.makedirs(args.out_dir, exist_ok=True)
-    h5_path = os.path.join(args.out_dir, f'baseline_scMAGCL_input_{args.tag}.h5')
+    h5_path = os.path.join(args.out_dir, f'baseline_scMACR_input_{args.tag}.h5')
     
     labels_df_src = _read_label_csv_flexible(args.label_csv)
     if labels_df_src is not None:

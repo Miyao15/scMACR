@@ -22,9 +22,6 @@ try:
 except ImportError:
     psutil = None
 
-# ------------------------------------------------------------
-# scMAGCA Preprocessing Compatibility Layers
-# ------------------------------------------------------------
 def read_dataset(adata, transpose=False, test_split=False, copy=False):
     if isinstance(adata, sc.AnnData):
         if copy: adata = adata.copy()
@@ -99,12 +96,12 @@ def _align_modalities(adata_atac, adata_rna):
     return adata_atac[common].copy(), adata_rna[common].copy()
 
 # ------------------------------------------------------------
-# scMAGCL Module Integration
+# scMACR Module Integration
 # ------------------------------------------------------------
 _THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 _PARENT_DIR = os.path.dirname(_THIS_DIR)
-# Explicitly targeting the scMAGCL-main folder as specified
-_SCMAGCL_ROOT = os.path.join(_PARENT_DIR, "scMAGCL-main")
+# Explicitly targeting the scMACR-main folder as specified
+_scMACR_ROOT = os.path.join(_PARENT_DIR, "scMACR-main")
 
 def _load_local_module(name, path):
     spec = importlib.util.spec_from_file_location(name, path)
@@ -115,14 +112,14 @@ def _load_local_module(name, path):
 
 gcl_cfg, CellDataset, device, gcl_train, gcl_test = [None] * 5
 
-def _ensure_scMAGCL_loaded():
+def _ensure_scMACR_loaded():
     global gcl_cfg, CellDataset, device, gcl_train, gcl_test
     if gcl_cfg is not None: return
     
-    gcl_utils = _load_local_module("utils", os.path.join(_SCMAGCL_ROOT, "utils.py"))
-    _load_local_module("scMAGCL", os.path.join(_SCMAGCL_ROOT, "scMAGCL.py"))
-    gcl_config = _load_local_module("config", os.path.join(_SCMAGCL_ROOT, "config.py"))
-    gcl_main = _load_local_module("main", os.path.join(_SCMAGCL_ROOT, "main.py"))
+    gcl_utils = _load_local_module("utils", os.path.join(_scMACR_ROOT, "utils.py"))
+    _load_local_module("scMACR", os.path.join(_scMACR_ROOT, "scMACR.py"))
+    gcl_config = _load_local_module("config", os.path.join(_scMACR_ROOT, "config.py"))
+    gcl_main = _load_local_module("main", os.path.join(_scMACR_ROOT, "main.py"))
     
     gcl_cfg, CellDataset, device, gcl_train, gcl_test = gcl_config.config, gcl_utils.CellDataset, gcl_utils.device, gcl_main.train, gcl_main.test
 
@@ -138,7 +135,7 @@ def _read_modality(name, h5ad_path=None, tenx_dir=None):
     raise ValueError(f"Input path for {name} missing.")
 
 def main_atac_rna():
-    parser = argparse.ArgumentParser(description="scMAGCL ATAC+RNA Pipeline")
+    parser = argparse.ArgumentParser(description="scMACR ATAC+RNA Pipeline")
     # Restore all missing arguments
     parser.add_argument("--atac_h5ad", default=None)
     parser.add_argument("--rna_h5ad", default=None)
@@ -169,7 +166,7 @@ def main_atac_rna():
     
     args = parser.parse_args()
 
-    _ensure_scMAGCL_loaded()
+    _ensure_scMACR_loaded()
     
     # Defaults from config
     args.seed = int(gcl_cfg["seed"]) if args.seed is None else int(args.seed)
