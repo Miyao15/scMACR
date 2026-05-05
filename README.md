@@ -1,4 +1,4 @@
-# scMACR: Multi-Granularity Asymmetric Graph Contrastive Learning for Single-Cell and Cross-Omics Representation
+# scMACR: Robust single-cell and cross-omics representation via multi-granularity asymmetric self-distillation
 
 ![scMACR Architecture](./framework.png)
 
