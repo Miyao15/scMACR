@@ -1,18 +1,18 @@
-# scMAGCL: Multi-Granularity Asymmetric Graph Contrastive Learning for Single-Cell and Cross-Omics Representation
+# scMACR: Multi-Granularity Asymmetric Graph Contrastive Learning for Single-Cell and Cross-Omics Representation
 
-![scMAGCL Architecture](./framework.png)
+![scMACR Architecture](./framework.png)
 
 ## Introduction
 
-Official PyTorch implementation of **scMAGCL**, a novel framework designed for multi-granularity asymmetric graph contrastive learning to enhance single-cell and cross-omics representation.
+Official PyTorch implementation of **scMACR**, a novel framework designed for multi-granularity asymmetric graph contrastive learning to enhance single-cell and cross-omics representation.
 
 ## Requirements
 
 The codebase is implemented in Python 3.8+ and PyTorch. To ensure reproducibility, we recommend setting up the environment using the provided `requirements.txt`:
 
 ```bash
-git clone [https://github.com/Miyao15/scMAGCL.git](https://github.com/Miyao15/scMAGCL.git)
-cd scMAGCL
+git clone [https://github.com/Miyao15/scMACR.git](https://github.com/Miyao15/scMACR.git)
+cd scMACR
 pip install -r requirements.txt
 ```
 
@@ -92,7 +92,7 @@ Please ensure you have configured the environment properly and placed the downlo
 The Young dataset is taken as an example:
 
 ```bash
-python scMAGCL-main/main.py --data_path "test_data/Young/data.h5" --n_clusters 11 --epochs 200
+python scMACR-main/main.py --data_path "test_data/Young/data.h5" --n_clusters 11 --epochs 200
 ```
 
 **2. Cross-Omics Integration (RNA + ADT)**
