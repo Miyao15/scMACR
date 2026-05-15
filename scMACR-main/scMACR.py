@@ -96,20 +96,12 @@ def DataAug(x, adj, prob_feature, prob_edge):
 
 def multiscale_contrastive_loss(z1, z2, adj_c, adj_m, adj_f, adj_c_aug, adj_m_aug, adj_f_aug, 
                                tau=0.8, alpha=0.55, beta=0.4):
-    """
-    多尺度对比损失：利用不同尺度的互补信息
-    """
-    # 1. 基于不同尺度的对比损失
+    
     loss_coarse = final_cl_loss(alpha, beta, z1, z2, adj_c, adj_c_aug, tau, hidden_norm=True)
     loss_medium = final_cl_loss(alpha, beta, z1, z2, adj_m, adj_m_aug, tau, hidden_norm=True)
     loss_fine = final_cl_loss(alpha, beta, z1, z2, adj_f, adj_f_aug, tau, hidden_norm=True)
-    
-    # 2. 跨尺度对比损失（粗-细对比，增强多尺度一致性）
     loss_cross_cf = final_cl_loss(alpha, beta, z1, z2, adj_c, adj_f_aug, tau * 0.8, hidden_norm=True)
     loss_cross_mf = final_cl_loss(alpha, beta, z1, z2, adj_m, adj_f_aug, tau * 0.9, hidden_norm=True)
-    
-    # 3. 自适应权重组合
-    # 权重基于各尺度的信息量
     coarse_info = adj_c.sum()
     medium_info = adj_m.sum()
     fine_info = adj_f.sum()
@@ -118,25 +110,16 @@ def multiscale_contrastive_loss(z1, z2, adj_c, adj_m, adj_f, adj_c_aug, adj_m_au
     w_c = coarse_info / total_info
     w_m = medium_info / total_info
     w_f = fine_info / total_info
-    
-    # 4. 组合损失
     scale_loss = w_c * loss_coarse + w_m * loss_medium + w_f * loss_fine
-    cross_loss = 0.2 * (loss_cross_cf + loss_cross_mf)  # 跨尺度损失权重较小
+    cross_loss = 0.2 * (loss_cross_cf + loss_cross_mf) 
     
     return scale_loss + cross_loss
 
 
 def byol_loss(z1, z2, hidden_norm=True):
-    """
-    BYOL损失：Bootstrap Your Own Latent
-    不需要负样本，通过预测目标网络的表示来学习
-    """
     if hidden_norm:
         z1 = F.normalize(z1, dim=1)
         z2 = F.normalize(z2, dim=1)
-    
-    # BYOL损失：最小化预测与目标之间的均方误差
-    # 对称化：z1预测z2 + z2预测z1
     loss_12 = 2 - 2 * (z1 * z2).sum(dim=1).mean()
     loss_21 = 2 - 2 * (z2 * z1).sum(dim=1).mean()
     
@@ -144,17 +127,11 @@ def byol_loss(z1, z2, hidden_norm=True):
 
 
 def momentum_update(online_net, target_net, tau=0.99):
-    """
-    动量更新目标网络
-    """
     for online_param, target_param in zip(online_net.parameters(), target_net.parameters()):
         target_param.data = tau * target_param.data + (1 - tau) * online_param.data
 
 
 class MLPProjector(nn.Module):
-    """
-    BYOL的MLP投影头和预测头
-    """
     def __init__(self, input_dim, hidden_dim, output_dim):
         super(MLPProjector, self).__init__()
         self.net = nn.Sequential(
@@ -169,9 +146,6 @@ class MLPProjector(nn.Module):
 
 
 class BYOLPredictor(nn.Module):
-    """
-    BYOL的预测头
-    """
     def __init__(self, input_dim, hidden_dim, output_dim):
         super(BYOLPredictor, self).__init__()
         self.net = nn.Sequential(
