@@ -81,7 +81,6 @@ def loader_construction(data_path):
     print(f"Loading dataset from: {data_path}")
     
     with h5py.File(data_path, 'r') as f:
-        # 动态检测标签名称：兼容小写的y，大写的Y，或者是labels
         label_key = None
         for k in ['y', 'Y', 'labels']:
             if k in f:
@@ -149,8 +148,6 @@ def loader_construction(data_path):
         # Format 2: Sparse matrix format / exprs (e.g., Young/data.h5)
         elif 'exprs' in f:
             print("Detected sparse matrix / exprs format.")
-            
-            # 兼容稀疏矩阵(包含 data, indices, indptr)或稠密矩阵
             if isinstance(f['exprs'], h5py.Group) and 'data' in f['exprs']:
                 data = f['exprs/data'][()]
                 indices = f['exprs/indices'][()]
@@ -175,7 +172,6 @@ def loader_construction(data_path):
                 print("Warning: No labels found. Generating dummy clusters.")
                 y_all = np.array([f"Cluster_{i % 10}" for i in range(X_all.shape[0])])
 
-            # 将字节类型解码为字符串
             y_all = np.array(y_all).squeeze()
             if len(y_all) > 0 and isinstance(y_all[0], bytes):
                 y_all = np.array([v.decode('utf-8') for v in y_all])
